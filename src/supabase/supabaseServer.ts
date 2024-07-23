@@ -1,4 +1,4 @@
-import { createServerClient } from "@supabase/ssr";
+import { type CookieOptions, createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 export async function supabaseServerClient() {
@@ -9,35 +9,20 @@ export async function supabaseServerClient() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll() {
-          return cookieStore.getAll();
+        get(name: string) {
+          return cookieStore.get(name)?.value;
         },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch (error) {
-            console.log(error);
-          }
+        set(name: string, value: string, options: CookieOptions) {
+          cookieStore.set({ name, value, ...options });
+        },
+        remove(name: string, options: CookieOptions) {
+          cookieStore.set({ name, value: "", ...options });
         },
       },
     }
   );
 
-  // supabase.auth.getUser()
+  //   supabase.auth.getUser();
 
   return supabase;
 }
-
-// cookies: {
-//   get(name: string) {
-//     return cookiesStore.get(name)?.value;
-//   },
-//   set(name: string, value: string, options: CookieOptions) {
-//     cookiesStore.set({ name, value, ...options });
-//   },
-//   remove(name: string, options: CookieOptions) {
-//     cookiesStore.set({ name, value: "", ...options });
-//   },
-// },
