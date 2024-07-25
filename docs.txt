@@ -1,2 +1,0 @@
-SUPABASE SSR
-https://supabase.com/docs/guides/auth/server-side/creating-a-client
