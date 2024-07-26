@@ -7,5 +7,11 @@ export const updateUserWorkspace = async (
   const supabase = await supabaseServerClient();
 
   // Update the user record
-  const {} = await supabase.rpc("add_workspace", {});
+  const { data: updateWorkspaceData, error: updateWorkspaceError } =
+    await supabase.rpc("add_workspace_to_user", {
+      user_id: userId,
+      new_workspace: workspaceId,
+    });
+
+  return [updateWorkspaceData, updateWorkspaceError];
 };
