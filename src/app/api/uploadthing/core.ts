@@ -6,7 +6,6 @@ const f = createUploadthing();
 
 const currUser = async () => {
   const user = await getUserData();
-
   return { userId: user?.id };
 };
 
