@@ -1,6 +1,7 @@
 import { FC } from "react";
 
 import { User, Workspace } from "@/types/app";
+import SidebarNav from "@/components/sidebar-nav";
 
 type SidebarProps = {
   userWorkspacesData: Workspace[];
@@ -13,7 +14,17 @@ const Sidebar: FC<SidebarProps> = ({
   currentWorkspaceData,
   userData,
 }) => {
-  return <aside>Sidebar</aside>;
+  return (
+    <aside
+      className={`fixed top-0 left-0 pt-[68px] pb-8 z-30 flex flex-col justify-between items-center h-screen w-20`}
+    >
+      <SidebarNav
+        currentWorkspaceData={currentWorkspaceData}
+        userWorkspacesData={userWorkspacesData}
+      />
+      Sidebar
+    </aside>
+  );
 };
 
 export default Sidebar;
