@@ -7,6 +7,8 @@ import {
 } from "@/actions/workspaces";
 
 import Sidebar from "@/components/sidebar";
+import InfoSection from "@/components/info-section";
+
 import { Workspace as UserWorkspace } from "@/types/app";
 
 const Workspace = async ({ params: { id } }: { params: { id: string } }) => {
@@ -29,6 +31,7 @@ const Workspace = async ({ params: { id } }: { params: { id: string } }) => {
           userData={userData}
           userWorkspacesData={userWorkspaceData as UserWorkspace[]}
         />
+        <InfoSection />
       </div>
       <div className="md:hidden block min-h-screen">Mobile</div>
     </>

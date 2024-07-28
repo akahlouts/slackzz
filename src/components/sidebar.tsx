@@ -11,6 +11,7 @@ import { FaPencil } from "react-icons/fa6";
 import { IoDiamondOutline } from "react-icons/io5";
 
 import SidebarNav from "@/components/sidebar-nav";
+import PreferencesDialog from "./preferences-dialog";
 import {
   Tooltip,
   TooltipContent,
@@ -21,7 +22,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Typography from "./ui/typography";
 
-import { useColorPrefrences } from "@/providers/color-prefrences";
+import { useColorPreferences } from "@/providers/color-preferences";
 
 import { cn } from "@/lib/utils";
 import { User, Workspace } from "@/types/app";
@@ -37,7 +38,7 @@ const Sidebar: FC<SidebarProps> = ({
   currentWorkspaceData,
   userData,
 }) => {
-  const { color } = useColorPrefrences();
+  const { color } = useColorPreferences();
 
   let backgroundColor = "bg-primary-dark";
   if (color === "green") {
@@ -147,7 +148,7 @@ const Sidebar: FC<SidebarProps> = ({
                           text="Profile"
                           className="hover:text-white hover:bg-blue-700 px-2 py-1 rounded cursor-pointer"
                         />
-                        {/* Prefrences Dialog */}
+                        <PreferencesDialog />
                         <hr className="bg-gray-400" />
                         <div className="flex gap-2 items-center hover:text-white hover:bg-blue-700 px-2 py-1 rounded cursor-pointer">
                           <IoDiamondOutline className="text-orange-400" />

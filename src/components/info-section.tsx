@@ -1,0 +1,30 @@
+"use client";
+
+import { useColorPreferences } from "@/providers/color-preferences";
+
+import { cn } from "@/lib/utils";
+
+const InfoSection = () => {
+  const { color } = useColorPreferences();
+
+  let backgroundColor = "bg-primary-light";
+  if (color === "green") {
+    backgroundColor = "bg-green-900";
+  } else if (color === "blue") {
+    backgroundColor = "bg-blue-900";
+  }
+
+  return (
+    <div
+      className={cn(
+        "fixed left-20 rounded-l-xl md:w-52 lg:w-[350px] h-[calc(100%-63px)] z-20 flex flex-col items-center",
+        backgroundColor
+      )}
+    >
+      <p>Channels</p>
+      <p>DMs</p>
+    </div>
+  );
+};
+
+export default InfoSection;
