@@ -16,12 +16,9 @@ const Workspace = async ({ params: { id } }: { params: { id: string } }) => {
 
   if (!userData) return redirect("/auth");
 
-  const [userWorkspaceData, userWorkspaceError] = await getUserWorkspaceData(
-    userData.workspaces!
-  );
+  const [userWorkspaceData] = await getUserWorkspaceData(userData.workspaces!);
 
-  const [currentWorkspaceData, currentWorkspaceError] =
-    await getCurrentWorkspaceData(id);
+  const [currentWorkspaceData] = await getCurrentWorkspaceData(id);
 
   return (
     <>
@@ -31,7 +28,10 @@ const Workspace = async ({ params: { id } }: { params: { id: string } }) => {
           userData={userData}
           userWorkspacesData={userWorkspaceData as UserWorkspace[]}
         />
-        <InfoSection />
+        <InfoSection
+          currentWorkspaceData={currentWorkspaceData}
+          userData={userData}
+        />
       </div>
       <div className="md:hidden block min-h-screen">Mobile</div>
     </>
