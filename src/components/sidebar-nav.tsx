@@ -41,7 +41,7 @@ const SidebarNav: FC<SidebarNavProps> = ({
   const switchWorkspace = (id: string) => {
     setSwitchingWorkspace(true);
     router.push(`/workspace/${id}`);
-    // setSwitchingWorkspace(false);
+    setSwitchingWorkspace(true);
   };
 
   return (
