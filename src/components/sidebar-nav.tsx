@@ -1,21 +1,14 @@
 import { FC } from "react";
 
-import { FaPlus } from "react-icons/fa";
 import { RiHome2Fill } from "react-icons/ri";
 import { PiChatsTeardrop } from "react-icons/pi";
 
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "./ui/tooltip";
-
+import CreateWorkspace from "./create-workspace";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Typography from "./ui/typography";
 import { Card, CardContent } from "./ui/card";
 import { Separator } from "./ui/separator";
-import { Button } from "./ui/button";
 
 import { Workspace } from "@/types/app";
 
@@ -33,70 +26,63 @@ const SidebarNav: FC<SidebarNavProps> = ({
       <ul className="flex flex-col space-y-4">
         <li>
           <div className="cursor-pointer items-center text-white mb-4 w-10 h-10 rounded-lg overflow-hidden">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Avatar>
-                    <AvatarImage
-                      src={currentWorkspaceData.image_url || ""}
-                      alt={currentWorkspaceData.name}
-                      className="object-cover w-full h-full"
+            <Popover>
+              <PopoverTrigger>
+                <Avatar>
+                  <AvatarImage
+                    src={currentWorkspaceData.image_url || ""}
+                    alt={currentWorkspaceData.name}
+                    className="object-cover w-full h-full"
+                  />
+                  <AvatarFallback className="bg-neutral-700">
+                    <Typography
+                      variant="p"
+                      text={currentWorkspaceData.name.slice(0, 2)}
                     />
-                    <AvatarFallback className="bg-neutral-700">
-                      <Typography
-                        variant="p"
-                        text={currentWorkspaceData.name.slice(0, 2)}
-                      />
-                    </AvatarFallback>
-                  </Avatar>
-                </TooltipTrigger>
-                <TooltipContent className="p-0" side="bottom">
-                  <Card className="w-[350px] border-0">
-                    <CardContent className="flex p-0 flex-col">
-                      {userWorkspacesData.map((workspace) => (
-                        <div
-                          key={workspace.id}
-                          className="hover:opacity-70 px-2 py-1 flex gap-2"
-                        >
-                          <Avatar>
-                            <AvatarImage
-                              src={workspace.image_url || ""}
-                              alt={workspace.name}
-                              className="object-cover w-full h-full"
-                            />
-                            <AvatarFallback>
-                              <Typography
-                                variant="p"
-                                text={workspace.name.slice(0, 2)}
-                              />
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
+                  </AvatarFallback>
+                </Avatar>
+              </PopoverTrigger>
+              <PopoverContent className="p-0" side="bottom">
+                <Card className="w-[350px] border-0">
+                  <CardContent className="flex p-0 flex-col">
+                    {userWorkspacesData.map((workspace) => (
+                      <div
+                        key={workspace.id}
+                        className="hover:opacity-70 px-2 py-1 flex gap-2"
+                      >
+                        <Avatar>
+                          <AvatarImage
+                            src={workspace.image_url || ""}
+                            alt={workspace.name}
+                            className="object-cover w-full h-full"
+                          />
+                          <AvatarFallback>
                             <Typography
                               variant="p"
-                              text={workspace.name}
-                              className="text-sm"
+                              text={workspace.name.slice(0, 2)}
                             />
-                            <Typography
-                              variant="p"
-                              text={workspace.invite_code || ""}
-                              className="text-xs lg:text-xs"
-                            />
-                          </div>
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <Typography
+                            variant="p"
+                            text={workspace.name}
+                            className="text-sm"
+                          />
+                          <Typography
+                            variant="p"
+                            text={workspace.invite_code || ""}
+                            className="text-xs lg:text-xs"
+                          />
                         </div>
-                      ))}
-                      <Separator />
-                      <div className="flex items-center gap-2 p-2">
-                        <Button variant="secondary">
-                          <FaPlus />
-                        </Button>
-                        <Typography variant="p" text="Add Workspace" />
                       </div>
-                    </CardContent>
-                  </Card>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+                    ))}
+                    <Separator />
+                    <CreateWorkspace />
+                  </CardContent>
+                </Card>
+              </PopoverContent>
+            </Popover>
           </div>
           <div className="flex flex-col items-center cursor-pointer group text-white">
             <div className="p-2 rounded-lg bg-[rgba(255,255,255,0.3)]">
