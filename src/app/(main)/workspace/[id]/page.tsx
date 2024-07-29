@@ -5,6 +5,7 @@ import {
   getCurrentWorkspaceData,
   getUserWorkspaceData,
 } from "@/actions/workspaces";
+import { getUserWorkspaceChannels } from "@/actions/get-user-workspace-channels";
 
 import Sidebar from "@/components/sidebar";
 import InfoSection from "@/components/info-section";
@@ -20,6 +21,11 @@ const Workspace = async ({ params: { id } }: { params: { id: string } }) => {
 
   const [currentWorkspaceData] = await getCurrentWorkspaceData(id);
 
+  const userWorkspaceChannels = await getUserWorkspaceChannels(
+    currentWorkspaceData.id,
+    userData.id
+  );
+
   return (
     <>
       <div className="hidden md:block">
@@ -31,6 +37,7 @@ const Workspace = async ({ params: { id } }: { params: { id: string } }) => {
         <InfoSection
           currentWorkspaceData={currentWorkspaceData}
           userData={userData}
+          userWorkspaceChannels={userWorkspaceChannels}
         />
       </div>
       <div className="md:hidden block min-h-screen">Mobile</div>

@@ -15,12 +15,13 @@ import CreateChannelDialog from "./create-channel-dialog";
 
 import { cn } from "@/lib/utils";
 
-import { User, Workspace } from "@/types/app";
+import { Channel, User, Workspace } from "@/types/app";
 
 const InfoSection: FC<{
   userData: User;
   currentWorkspaceData: Workspace;
-}> = ({ userData, currentWorkspaceData }) => {
+  userWorkspaceChannels: Channel[];
+}> = ({ userData, currentWorkspaceData, userWorkspaceChannels }) => {
   const { color } = useColorPreferences();
 
   const [isChannelCollapsed, setIsChannelCollapsed] = useState(false);
@@ -68,21 +69,14 @@ const InfoSection: FC<{
               </div>
             </div>
             <CollapsibleContent>
-              <Typography
-                variant="p"
-                text="# channel-name-1"
-                className={cn("px-2 py-1 rounded-sm cursor-pointer", hoverBg)}
-              />
-              <Typography
-                variant="p"
-                text="# channel-name-2"
-                className={cn("px-2 py-1 rounded-sm cursor-pointer", hoverBg)}
-              />
-              <Typography
-                variant="p"
-                text="# channel-name-3"
-                className={cn("px-2 py-1 rounded-sm cursor-pointer", hoverBg)}
-              />
+              {userWorkspaceChannels.map((channel) => (
+                <Typography
+                  key={channel.id}
+                  variant="p"
+                  text={`# ${channel.name}`}
+                  className={cn("px-2 py-1 rounded-sm cursor-pointer", hoverBg)}
+                />
+              ))}
             </CollapsibleContent>
           </Collapsible>
         </div>

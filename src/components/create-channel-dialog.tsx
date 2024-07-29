@@ -1,4 +1,5 @@
 import { Dispatch, FC, SetStateAction, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
 import { z } from "zod";
@@ -28,6 +29,7 @@ const CreateChannelDialog: FC<{
   userId: string;
 }> = ({ dialogOpen, setDialogOpen, userId, workspaceId }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   const formSchema = z.object({
     name: z
@@ -48,6 +50,7 @@ const CreateChannelDialog: FC<{
 
       await createChannel({ name, userId, workspaceId });
 
+      router.refresh();
       setIsSubmitting(false);
       setDialogOpen(false);
       form.reset();
