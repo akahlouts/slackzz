@@ -12,14 +12,18 @@ import InfoSection from "@/components/info-section";
 
 import { Workspace as UserWorkspace } from "@/types/app";
 
-const Workspace = async ({ params: { id } }: { params: { id: string } }) => {
+const Workspace = async ({
+  params: { workspaceId },
+}: {
+  params: { workspaceId: string };
+}) => {
   const userData = await getUserData();
 
   if (!userData) return redirect("/auth");
 
   const [userWorkspaceData] = await getUserWorkspaceData(userData.workspaces!);
 
-  const [currentWorkspaceData] = await getCurrentWorkspaceData(id);
+  const [currentWorkspaceData] = await getCurrentWorkspaceData(workspaceId);
 
   const userWorkspaceChannels = await getUserWorkspaceChannels(
     currentWorkspaceData.id,
@@ -38,6 +42,7 @@ const Workspace = async ({ params: { id } }: { params: { id: string } }) => {
           currentWorkspaceData={currentWorkspaceData}
           userData={userData}
           userWorkspaceChannels={userWorkspaceChannels}
+          currentChannelId=""
         />
       </div>
       <div className="md:hidden block min-h-screen">Mobile</div>
