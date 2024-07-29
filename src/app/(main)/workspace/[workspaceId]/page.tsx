@@ -9,6 +9,7 @@ import { getUserWorkspaceChannels } from "@/actions/get-user-workspace-channels"
 
 import Sidebar from "@/components/sidebar";
 import InfoSection from "@/components/info-section";
+import NoDataScreen from "@/components/no-data-component";
 
 import { Workspace as UserWorkspace } from "@/types/app";
 
@@ -30,6 +31,12 @@ const Workspace = async ({
     userData.id
   );
 
+  if (userWorkspaceChannels.length) {
+    redirect(
+      `/workspace/${workspaceId}/channels/${userWorkspaceChannels[0].id}`
+    );
+  }
+
   return (
     <>
       <div className="hidden md:block">
@@ -43,6 +50,12 @@ const Workspace = async ({
           userData={userData}
           userWorkspaceChannels={userWorkspaceChannels}
           currentChannelId=""
+        />
+
+        <NoDataScreen
+          userId={userData.id}
+          workspaceId={currentWorkspaceData.id}
+          workspaceName={currentWorkspaceData.name}
         />
       </div>
       <div className="md:hidden block min-h-screen">Mobile</div>
