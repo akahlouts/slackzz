@@ -7,6 +7,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { v4 as uuid } from "uuid";
 
+import { supabaseBrowserClient } from "@/supabase/supabaseClient";
+
 import { Card, CardContent } from "./ui/card";
 import Typography from "./ui/typography";
 import { Form, FormControl, FormField, FormItem, FormLabel } from "./ui/form";
@@ -22,6 +24,7 @@ type ChatFileUploadProps = {
   userData: User;
   workspaceData: Workspace;
   channel: Channel;
+  toggleFileUploadModal: () => void;
 };
 
 const formSchema = z.object({
@@ -41,6 +44,7 @@ const ChatFileUpload: FC<ChatFileUploadProps> = ({
   channel,
   userData,
   workspaceData,
+  toggleFileUploadModal,
 }) => {
   const [isUploading, setIsUploading] = useState(false);
 
@@ -54,7 +58,53 @@ const ChatFileUpload: FC<ChatFileUploadProps> = ({
   const imageRef = form.register("file");
 
   async function handleUpload(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    setIsUploading(true);
+    const uniqueId = uuid();
+    const file = values.file?.[0];
+
+    if (!file) return;
+
+    const supabase = supabaseBrowserClient;
+
+    let fileTypePrefix = "";
+    if (file.type === "application/pdf") {
+      fileTypePrefix = "pdf";
+    } else if (file.type.startsWith("image/")) {
+      fileTypePrefix = "img";
+    }
+
+    const fileName = `chat/${fileTypePrefix}-${uniqueId}`;
+
+    const { data, error } = await supabase.storage
+      .from("chat-files")
+      .upload(fileName, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    if (error) {
+      console.log("Error uploading file", error);
+      return { error: error.message };
+    }
+
+    const { data: messageData, error: messageInsertError } = await supabase
+      .from("messages")
+      .insert({
+        file_url: data.path,
+        user_id: userData.id,
+        channel_id: channel.id,
+        workspace_id: workspaceData.id,
+      });
+
+    if (messageInsertError) {
+      console.log("Error inserting message", messageInsertError);
+      return { error: messageInsertError };
+    }
+
+    setIsUploading(false);
+    toggleFileUploadModal();
+    toast.success("File uploaded successfully");
+    form.reset();
   }
 
   return (

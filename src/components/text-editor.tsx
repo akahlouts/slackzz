@@ -118,6 +118,7 @@ const TextEditor: FC<TextEditorProps> = ({
             userData={userData}
             workspaceData={workspaceData}
             channel={channel}
+            toggleFileUploadModal={toggleFileUploadModal}
           />
         </DialogContent>
       </Dialog>
