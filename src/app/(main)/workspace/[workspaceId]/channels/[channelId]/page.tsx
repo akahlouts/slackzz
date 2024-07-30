@@ -68,6 +68,7 @@ const ChannelId = async ({
           type="channel"
           channel={currentChannelData}
           workspaceData={currentWorkspaceData}
+          userData={userData}
         />
       </div>
     </div>
