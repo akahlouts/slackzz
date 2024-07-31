@@ -1,12 +1,14 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { NextApiRequest } from "next";
 
 import supabaseServerClientPages from "@/supabase/supabaseServerPages";
 
 import { getUserDataPages } from "@/actions/get-user-data";
 
+import { SocketIoApiResponse } from "@/types/app";
+
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: SocketIoApiResponse
 ) {
   if (req.method !== "POST")
     return res.status(405).json({ message: "Method not allowed" });
@@ -59,6 +61,7 @@ export default async function handler(
       return res.status(500).json({ message: "Internal server error" });
     }
 
+    // emit message to the channel
     return res.status(201).json({ message: "Message created", data });
   } catch (error) {
     console.log("MESSAGE CREATION ERROR", error);
