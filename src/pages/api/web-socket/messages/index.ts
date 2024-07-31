@@ -54,6 +54,7 @@ export default async function handler(
         file_url: fileUrl,
       })
       .select("*, user: user_id(*)")
+      .order("created_at", { ascending: true })
       .single();
 
     if (creatingMessageError) {
@@ -62,6 +63,11 @@ export default async function handler(
     }
 
     // emit message to the channel
+    res?.socket?.server?.io?.emit(
+      `channel:${channelId}:channel-messages`,
+      data
+    );
+
     return res.status(201).json({ message: "Message created", data });
   } catch (error) {
     console.log("MESSAGE CREATION ERROR", error);
