@@ -1,23 +1,32 @@
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
 import { useChatFile } from "@/hooks/use-chat-file";
 import { useForm } from "react-hook-form";
 
-import { z } from "zod";
+import { string, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
   MdOutlineAdminPanelSettings,
   MdOutlineAssistantPhoto,
 } from "react-icons/md";
+import { Edit, Trash } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Typography from "./ui/typography";
 import { Form, FormControl, FormField, FormItem } from "./ui/form";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "./ui/dialog";
 
 import { cn } from "@/lib/utils";
 
@@ -56,6 +65,7 @@ const ChatItem: FC<ChatItemProps> = ({
 }) => {
   const { publicUrl, fileType } = useChatFile(fileUrl!);
   const [isEditing, setIsEditing] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -74,9 +84,24 @@ const ChatItem: FC<ChatItemProps> = ({
   const isImage = fileType === "image" && fileUrl;
   const isLoading = form.formState.isSubmitting;
 
+  useEffect(() => form.reset({ content: content ?? "" }), [content, form]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsEditing(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
     console.log(data);
   };
+
+  const handleDelete = async () => {};
 
   const FilePreview = () => (
     <>
@@ -144,11 +169,80 @@ const ChatItem: FC<ChatItemProps> = ({
         <span className="text-[10px]">Press ESC to cancel, enter to save</span>
       </Form>
     ) : (
-      <div
-        className={cn("text-sm", { "text-xs opacity-90 italic": deleted })}
-        dangerouslySetInnerHTML={{ __html: content ?? "" }}
-      />
+      <div className={cn("text-sm", { "text-xs opacity-90 italic": deleted })}>
+        {content ?? ""}
+      </div>
     );
+
+  const DeleteDialog = () => (
+    <Dialog
+      onOpenChange={() => setOpenDeleteDialog(!openDeleteDialog)}
+      open={openDeleteDialog}
+    >
+      <DialogTrigger>
+        <Trash size={20} />
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Are you sure you want to delete?</DialogTitle>
+          <DialogDescription>
+            This action cannot be undone. This will permanently delete the
+            message.
+          </DialogDescription>
+          <div className="text-center">
+            {isPdf && (
+              <div className="items-start justify-center gap-3 relative">
+                <Typography variant="p" text="Shared a PDF file" />
+                <Link
+                  href={publicUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:underline"
+                >
+                  View PDF
+                </Link>
+              </div>
+            )}
+            {!fileUrl && !isEditing && (
+              <div className="text-sm p-5">{content ?? ""}</div>
+            )}
+            {isImage && (
+              <Link
+                href={publicUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative aspect-square rounded-md mt-2 overflow-hidden border flex items-center bg-secondary h-48 w-48 mx-auto"
+              >
+                <Image
+                  src={publicUrl}
+                  alt={content ?? ""}
+                  fill
+                  className="object-cover"
+                />
+              </Link>
+            )}
+          </div>
+        </DialogHeader>
+
+        <div className="flex flex-col gap-2">
+          <Button
+            onClick={() => setOpenDeleteDialog(false)}
+            className="w-full"
+            variant="secondary"
+          >
+            No, Cancel
+          </Button>
+          <Button
+            onClick={handleDelete}
+            className="w-full"
+            variant="destructive"
+          >
+            Yes, Delete
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
 
   return (
     <div className="relative group flex items-center hover:bg-black/5 px-1 py-2 rounded transition w-full">
@@ -183,6 +277,19 @@ const ChatItem: FC<ChatItemProps> = ({
           {!fileUrl && <EditableContent />}
         </div>
       </div>
+
+      {canDeleteMessage && (
+        <div className="hidden absolute group-hover:flex flex-row gap-2 border bg-white dark:bg-black dark:text-white text-black rounded-md p-2 top-0 -translate-y-1/3 right-0">
+          <DeleteDialog />
+          {canEditMessage && (
+            <Edit
+              className="cursor-pointer"
+              size={20}
+              onClick={() => setIsEditing(true)}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 };
