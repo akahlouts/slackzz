@@ -31,11 +31,11 @@ const Workspace = async ({
     userData.id
   );
 
-  if (userWorkspaceChannels.length) {
-    redirect(
-      `/workspace/${workspaceId}/channels/${userWorkspaceChannels[0].id}`
-    );
-  }
+  // if (userWorkspaceChannels.length) {
+  //   redirect(
+  //     `/workspace/${workspaceId}/channels/${userWorkspaceChannels[0].id}`
+  //   );
+  // }
 
   return (
     <>

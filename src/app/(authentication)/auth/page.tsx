@@ -2,16 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+
+import { Provider } from "@supabase/supabase-js";
+import { supabaseBrowserClient } from "@/supabase/supabaseClient";
+import { registerWithEmail } from "@/actions/register-with-email";
+
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { BsSlack } from "react-icons/bs";
 import { FcGoogle } from "react-icons/fc";
 import { RxGithubLogo } from "react-icons/rx";
 import { MdOutlineAutoAwesome } from "react-icons/md";
-
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Provider } from "@supabase/supabase-js";
 
 import Typography from "@/components/ui/typography";
 import { Button } from "@/components/ui/button";
@@ -24,9 +27,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-import { supabaseBrowserClient } from "@/supabase/supabaseClient";
-import { registerWithEmail } from "@/actions/register-with-email";
-
 const AuthPage = () => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
@@ -34,20 +34,19 @@ const AuthPage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const getCurrentUser = async () => {
+    const getCurrUser = async () => {
       const {
         data: { session },
       } = await supabaseBrowserClient.auth.getSession();
 
-      console.log(session);
       if (session) {
         return router.push("/");
       }
     };
 
-    getCurrentUser();
+    getCurrUser();
     setIsMounted(true);
-  }, []);
+  }, [router]);
 
   const formSchema = z.object({
     email: z.string().email().min(2, { message: "Email must be 2 characters" }),
@@ -64,13 +63,11 @@ const AuthPage = () => {
     setIsAuthenticating(true);
     const response = await registerWithEmail(values);
     const { data, error } = JSON.parse(response);
-
+    setIsAuthenticating(false);
     if (error) {
       console.warn("Sign in error", error);
       return;
     }
-
-    setIsAuthenticating(false);
   }
 
   async function socialAuth(provider: Provider) {
@@ -142,7 +139,6 @@ const AuthPage = () => {
             <div className="ml-[10px] flex-1 border-t bg-neutral-300" />
           </div>
 
-          {/* FORM */}
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <fieldset disabled={isAuthenticating}>

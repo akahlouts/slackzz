@@ -4,6 +4,7 @@ import { useColorPreferences } from "@/providers/color-preferences";
 
 import { RiHome2Fill } from "react-icons/ri";
 import { PiChatsTeardrop } from "react-icons/pi";
+import { Copy } from "lucide-react";
 
 import CreateWorkspace from "./create-workspace";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
@@ -12,6 +13,7 @@ import Typography from "./ui/typography";
 import { Card, CardContent } from "./ui/card";
 import { Separator } from "./ui/separator";
 import ProgressBar from "./progress-bar";
+import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
 
@@ -42,6 +44,16 @@ const SidebarNav: FC<SidebarNavProps> = ({
     setSwitchingWorkspace(true);
     router.push(`/workspace/${id}`);
     setSwitchingWorkspace(true);
+  };
+
+  const copyInviteLink = (inviteCode: string) => {
+    const currentDomain = window.location.origin;
+
+    navigator.clipboard.writeText(
+      `${currentDomain}/create-workspace/${inviteCode}`
+    );
+
+    toast.success("Invite link cpoied to clipboard");
   };
 
   return (
@@ -84,7 +96,9 @@ const SidebarNav: FC<SidebarNavProps> = ({
                               isActive && `${backgroundColor} text-white`,
                               "cursor-pointer px-2 py-1 flex gap-2"
                             )}
-                            onClick={() => switchWorkspace(workspace.id)}
+                            onClick={() =>
+                              !isActive && switchWorkspace(workspace.id)
+                            }
                           >
                             <Avatar>
                               <AvatarImage
@@ -105,11 +119,19 @@ const SidebarNav: FC<SidebarNavProps> = ({
                                 text={workspace.name}
                                 className="text-sm"
                               />
-                              <Typography
-                                variant="p"
-                                text={workspace.invite_code || ""}
-                                className="text-xs lg:text-xs"
-                              />
+                              <div className="flex items-center gap-x-2">
+                                <Typography
+                                  variant="p"
+                                  text="Copy Invite Link"
+                                  className="text-xs lg:text-xs"
+                                />
+                                <Copy
+                                  onClick={() =>
+                                    copyInviteLink(workspace.invite_code!)
+                                  }
+                                  size={18}
+                                />
+                              </div>
                             </div>
                           </div>
                         );
