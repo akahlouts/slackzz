@@ -1,14 +1,27 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-import { MdOutlineAdminPanelSettings } from "react-icons/md";
+import { useChatFile } from "@/hooks/use-chat-file";
+import { useForm } from "react-hook-form";
+
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import {
+  MdOutlineAdminPanelSettings,
+  MdOutlineAssistantPhoto,
+} from "react-icons/md";
 
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Typography from "./ui/typography";
+import { Form, FormControl, FormField, FormItem } from "./ui/form";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
+
+import { cn } from "@/lib/utils";
 
 import { Channel, User } from "@/types/app";
-import { useChatFile } from "@/hooks/use-chat-file";
 
 type ChatItemProps = {
   id: string;
@@ -24,6 +37,10 @@ type ChatItemProps = {
   channelData?: Channel;
 };
 
+const formSchema = z.object({
+  content: z.string().min(2),
+});
+
 const ChatItem: FC<ChatItemProps> = ({
   content,
   currentUser,
@@ -38,6 +55,14 @@ const ChatItem: FC<ChatItemProps> = ({
   fileUrl,
 }) => {
   const { publicUrl, fileType } = useChatFile(fileUrl!);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      content: content ?? "",
+    },
+  });
 
   const isSuperAdmin = currentUser.id === channelData?.user_id;
   const isRegulator =
@@ -47,7 +72,11 @@ const ChatItem: FC<ChatItemProps> = ({
   const canEditMessage = !deleted && isOwner && !fileUrl;
   const isPdf = fileType === "pdf" && fileUrl;
   const isImage = fileType === "image" && fileUrl;
-  // const isLoading =
+  const isLoading = form.formState.isSubmitting;
+
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    console.log(data);
+  };
 
   const FilePreview = () => (
     <>
@@ -86,6 +115,41 @@ const ChatItem: FC<ChatItemProps> = ({
     </>
   );
 
+  const EditableContent = () =>
+    isEditing ? (
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <fieldset
+            className="flex items-center w-full gap-x-2 pt-2"
+            disabled={isLoading}
+          >
+            <FormField
+              control={form.control}
+              name="content"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormControl>
+                    <Input
+                      className="p-2 border-none bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                      placeholder="edited message"
+                      {...field}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <Button size="sm">Save</Button>
+          </fieldset>
+        </form>
+        <span className="text-[10px]">Press ESC to cancel, enter to save</span>
+      </Form>
+    ) : (
+      <div
+        className={cn("text-sm", { "text-xs opacity-90 italic": deleted })}
+        dangerouslySetInnerHTML={{ __html: content ?? "" }}
+      />
+    );
+
   return (
     <div className="relative group flex items-center hover:bg-black/5 px-1 py-2 rounded transition w-full">
       <div className="flex gap-x-2">
@@ -108,11 +172,15 @@ const ChatItem: FC<ChatItemProps> = ({
               text={user.name ?? user.email}
               className="font-semibold text-sm hover:underline cursor-pointer"
             />
-            <MdOutlineAdminPanelSettings className="w-5 h-5" />
-            <span className="text-xs">(edited)</span>
+            {isSuperAdmin && (
+              <MdOutlineAdminPanelSettings className="w-5 h-5" />
+            )}
+            {isRegulator && <MdOutlineAssistantPhoto className="w-5 h-5" />}
+            {isUpdated && !deleted && <span className="text-xs">(edited)</span>}
             <span>{timestamp}</span>
           </div>
           <FilePreview />
+          {!fileUrl && <EditableContent />}
         </div>
       </div>
     </div>
