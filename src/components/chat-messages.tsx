@@ -2,6 +2,7 @@ import { FC } from "react";
 import { format } from "date-fns";
 
 import { useChatFetcher } from "@/hooks/use-chat-fetcher";
+import { useChatSocketConntection } from "@/hooks/use-chat-socket-connection";
 
 import ChatItem from "./chat-item";
 import DotAnimatedLoader from "./dot-animated-loader";
@@ -48,6 +49,19 @@ const ChatMessages: FC<ChatMessagesProps> = ({
       paramKey,
       paramValue,
     });
+
+  useChatSocketConntection({
+    queryKey,
+    addKey:
+      type === "Channel"
+        ? `${queryKey}:channel-messages`
+        : `direct_messages:post`,
+    updateKey:
+      type === "Channel"
+        ? `${queryKey}:channel-messages:update`
+        : `direct_messages:update`,
+    paramValue,
+  });
 
   if (status === "pending") {
     return <DotAnimatedLoader />;

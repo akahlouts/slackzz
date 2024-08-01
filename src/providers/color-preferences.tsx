@@ -37,12 +37,10 @@ export const ColorPreferencesProvider: FC<{ children: ReactNode }> = ({
   const [color, setColor] = useState<Colors>(() => {
     const storedColor =
       typeof localStorage !== "undefined"
-        ? localStorage.getItem("color")
+        ? localStorage.getItem("selectedColor")
         : null;
-
     return (storedColor as Colors) || "";
   });
-
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {

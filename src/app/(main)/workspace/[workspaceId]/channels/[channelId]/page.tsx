@@ -35,7 +35,7 @@ const ChannelId = async ({
   if (!currentChannelData) return redirect("/");
 
   return (
-    <div className="hidden md:block">
+    <div className="hidden md:block -mt-[1px]">
       <ChatGroup
         type="Channel"
         userData={userData}
