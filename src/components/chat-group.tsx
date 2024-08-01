@@ -5,8 +5,8 @@ import { FC } from "react";
 import Sidebar from "./sidebar";
 import InfoSection from "./info-section";
 import ChatHeader from "./chat-header";
-import Typography from "./ui/typography";
 import TextEditor from "./text-editor";
+import ChatMessages from "./chat-messages";
 
 import { Channel, User, Workspace } from "@/types/app";
 
@@ -63,7 +63,19 @@ const ChatGroup: FC<ChatGroupProps> = ({
           <ChatHeader title={headerTitle} chatId={chatId} userData={userData} />
 
           <div className="mt-10">
-            <Typography text="Chat Content" variant="h4" />
+            <ChatMessages
+              userData={userData}
+              name={currentChannelData?.name ?? "USERNAME"}
+              workspaceData={currentWorkspaceData}
+              chatId={chatId}
+              type={type}
+              apiUrl={apiUrl}
+              socketUrl={socketUrl}
+              socketQuery={socketQuery}
+              paramKey={paramKey}
+              paramValue={paramValue}
+              channelData={currentChannelData}
+            />
           </div>
         </div>
       </div>

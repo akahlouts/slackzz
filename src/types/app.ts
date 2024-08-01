@@ -37,6 +37,20 @@ export type Channel = {
   workspace_id: string;
 };
 
+export type Messages = {
+  channel_id: string;
+  content: string | null;
+  created_at: string;
+  file_url: string | null;
+  id: string;
+  is_deleted: boolean | null;
+  updated_at: string;
+  user_id: string;
+  workspace_id: string;
+};
+
+export type MessageWithUser = Messages & { user: User };
+
 export type SocketIoApiResponse = NextApiResponse & {
   socket: Socket & {
     server: NetServer & {
