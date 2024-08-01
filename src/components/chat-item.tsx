@@ -2,10 +2,12 @@ import { FC, useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
+import axios from "axios";
+
 import { useChatFile } from "@/hooks/use-chat-file";
 import { useForm } from "react-hook-form";
 
-import { string, z } from "zod";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
@@ -66,6 +68,7 @@ const ChatItem: FC<ChatItemProps> = ({
   const { publicUrl, fileType } = useChatFile(fileUrl!);
   const [isEditing, setIsEditing] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -97,11 +100,20 @@ const ChatItem: FC<ChatItemProps> = ({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    console.log(data);
+  const onSubmit = async ({ content }: z.infer<typeof formSchema>) => {
+    const url = `${socketUrl}/${id}?${new URLSearchParams(socketQuery)}`;
+    await axios.patch(url, { content });
+    setIsEditing(false);
+    form.reset();
   };
 
-  const handleDelete = async () => {};
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    const url = `${socketUrl}/${id}?${new URLSearchParams(socketQuery)}`;
+    await axios.delete(url);
+    setIsDeleting(false);
+    setOpenDeleteDialog(false);
+  };
 
   const FilePreview = () => (
     <>
@@ -229,6 +241,7 @@ const ChatItem: FC<ChatItemProps> = ({
             onClick={() => setOpenDeleteDialog(false)}
             className="w-full"
             variant="secondary"
+            disabled={isDeleting}
           >
             No, Cancel
           </Button>
@@ -236,6 +249,7 @@ const ChatItem: FC<ChatItemProps> = ({
             onClick={handleDelete}
             className="w-full"
             variant="destructive"
+            disabled={isDeleting}
           >
             Yes, Delete
           </Button>
