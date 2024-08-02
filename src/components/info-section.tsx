@@ -141,16 +141,18 @@ const InfoSection: FC<{
             <CollapsibleContent>
               {currentWorkspaceData?.members?.map((member) => {
                 return (
-                  <Typography
-                    key={member.id}
-                    variant="p"
-                    text={member.name || member.email}
-                    className={cn(
-                      "px-2 py-1 rounded-sm cursor-pointer",
-                      `hover:${secondaryBg}`
-                    )}
-                    onClick={() => navigateToDirectMessage(member.id)}
-                  />
+                  member.id !== userData.id && (
+                    <Typography
+                      key={member.id}
+                      variant="p"
+                      text={member.name || member.email}
+                      className={cn(
+                        "px-2 py-1 rounded-sm cursor-pointer",
+                        `hover:${secondaryBg}`
+                      )}
+                      onClick={() => navigateToDirectMessage(member.id)}
+                    />
+                  )
                 );
               })}
             </CollapsibleContent>
