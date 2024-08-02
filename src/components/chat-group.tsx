@@ -7,6 +7,7 @@ import InfoSection from "./info-section";
 import ChatHeader from "./chat-header";
 import TextEditor from "./text-editor";
 import ChatMessages from "./chat-messages";
+import SearchBar from "./search-bar";
 
 import { Channel, User, Workspace } from "@/types/app";
 
@@ -58,6 +59,11 @@ const ChatGroup: FC<ChatGroupProps> = ({
           currentChannelId={
             type === "Channel" ? currentChannelData?.id : undefined
           }
+        />
+        <SearchBar
+          currentWorkspaceData={currentWorkspaceData}
+          currentChannelData={currentChannelData}
+          loggedInUserId={userData.id}
         />
         <div className="p-4 relative w-full overflow-hidden">
           <ChatHeader title={headerTitle} chatId={chatId} userData={userData} />

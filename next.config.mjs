@@ -14,6 +14,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "ktpfrebqowrsxzglwswf.supabase.co",
       },
+      {
+        protocol: "https",
+        hostname: "cdn.pixabay.com",
+      },
     ],
   },
 };
