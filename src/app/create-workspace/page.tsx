@@ -145,7 +145,7 @@ const Step2 = () => {
 
             {imageUrl ? (
               <Button
-                type="submit"
+                type="button"
                 onClick={handleSubmit}
                 size="sm"
                 variant="destructive"
@@ -158,7 +158,7 @@ const Step2 = () => {
                 size="sm"
                 className="text-white bg-gray-500"
               >
-                <Typography text="Select and Image" variant="p" />
+                <Typography text="Select an Image" variant="p" />
               </Button>
             )}
           </div>

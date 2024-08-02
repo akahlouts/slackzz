@@ -11,9 +11,12 @@ import { Workspace as UserWorkspace } from "@/types/app";
 import ChatGroup from "@/components/chat-group";
 
 const ChannelId = async ({
-  params: { workspaceId, channelId },
+  params: { channelId, workspaceId },
 }: {
-  params: { workspaceId: string; channelId: string };
+  params: {
+    workspaceId: string;
+    channelId: string;
+  };
 }) => {
   const userData = await getUserData();
 

@@ -41,7 +41,7 @@ export async function GET(req: Request) {
 
     if (error) {
       console.log("GET MESSAGES ERROR: ", error);
-      return new Response("Bad Requset", { status: 400 });
+      return new Response("Bad Request", { status: 400 });
     }
 
     return NextResponse.json({ data });

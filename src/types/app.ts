@@ -20,7 +20,7 @@ export type Workspace = {
   created_at: string;
   id: string;
   image_url: string | null;
-  invite_code: string;
+  invite_code: string | null;
   members: User[] | null;
   name: string;
   regulators: string[] | null;
@@ -35,7 +35,7 @@ export type Channel = {
   regulators: string[] | null;
   user_id: string;
   workspace_id: string;
-  // created_at: string;
+  created_at: string;
 };
 
 export type Messages = {
