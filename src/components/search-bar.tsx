@@ -1,6 +1,12 @@
 import { FC } from "react";
 import { useRouter } from "next/navigation";
 
+import {
+  addChannelToUser,
+  updateChannelMembers,
+  updateChannelRegulators,
+} from "@/actions/channels";
+
 import { Search } from "lucide-react";
 import {
   MdOutlineAdminPanelSettings,
@@ -12,6 +18,7 @@ import { useColorPreferences } from "@/providers/color-preferences";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { ScrollArea } from "./ui/scroll-area";
 import { Button } from "./ui/button";
+import { toast } from "sonner";
 
 import { cn } from "@/lib/utils";
 
@@ -50,8 +57,22 @@ const SearchBar: FC<SearchBarProps> = ({
     return currentChannelData?.user_id === memberId;
   };
 
-  const addUserToChannel = (userId: string, channelId: string) => {};
-  const makeUserRegulator = (userId: string, channelId: string) => {};
+  const addUserToChannel = async (userId: string, channelId: string) => {
+    // Add user to channel
+    await updateChannelMembers(channelId, userId);
+
+    // Add channel to user's channels
+    await addChannelToUser(userId, channelId);
+
+    router.refresh();
+    toast.success("User added to channel");
+  };
+  const makeUserRegulator = async (userId: string, channelId: string) => {
+    await updateChannelRegulators(userId, channelId);
+
+    router.refresh();
+    toast.success("User is now a regulator");
+  };
 
   return (
     <div
