@@ -27,7 +27,7 @@ export const useChatFetcher = ({
   }: any): Promise<{ data: MessageWithUser[] }> => {
     const url = `${apiUrl}?${paramKey}=${encodeURIComponent(
       paramValue
-    )}&page=${pageParam}$size=${pageSize}`;
+    )}&page=${pageParam}&size=${pageSize}`;
 
     const { data } = await axios.get<MessageWithUser>(url);
 

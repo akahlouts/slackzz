@@ -6,19 +6,19 @@ import { useSocket } from "@/providers/web-socket";
 
 import { MessageWithUser } from "@/types/app";
 
-type UseChatSocketConntectionProps = {
+type useChatSocketConnectionProps = {
   addKey: string;
   queryKey: string;
   updateKey: string;
   paramValue: string;
 };
 
-export const useChatSocketConntection = ({
+export const useChatSocketConnection = ({
   addKey,
   paramValue,
   updateKey,
   queryKey,
-}: UseChatSocketConntectionProps) => {
+}: useChatSocketConnectionProps) => {
   const { socket } = useSocket();
   const queryClient = useQueryClient();
 

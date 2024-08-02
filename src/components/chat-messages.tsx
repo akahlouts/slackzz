@@ -1,11 +1,14 @@
-import { FC } from "react";
+import { ElementRef, FC, useRef } from "react";
 import { format } from "date-fns";
 
 import { useChatFetcher } from "@/hooks/use-chat-fetcher";
-import { useChatSocketConntection } from "@/hooks/use-chat-socket-connection";
+import { useChatSocketConnection } from "@/hooks/use-chat-socket-connection";
+import { useChatScrollHandler } from "@/hooks/use-chat-scroll-handler";
 
 import ChatItem from "./chat-item";
 import DotAnimatedLoader from "./dot-animated-loader";
+import IntroBanner from "./intro-banner";
+import { Button } from "./ui/button";
 
 import { Channel, User, Workspace } from "@/types/app";
 
@@ -38,6 +41,9 @@ const ChatMessages: FC<ChatMessagesProps> = ({
   workspaceData,
   channelData,
 }) => {
+  const chatRef = useRef<ElementRef<"div">>(null);
+  const bottomRef = useRef<ElementRef<"div">>(null);
+
   const queryKey =
     type === "Channel" ? `channel:${chatId}` : `direct_message:${chatId}`;
 
@@ -50,7 +56,7 @@ const ChatMessages: FC<ChatMessagesProps> = ({
       paramValue,
     });
 
-  useChatSocketConntection({
+  useChatSocketConnection({
     queryKey,
     addKey:
       type === "Channel"
@@ -61,6 +67,12 @@ const ChatMessages: FC<ChatMessagesProps> = ({
         ? `${queryKey}:channel-messages:update`
         : `direct_messages:update`,
     paramValue,
+  });
+
+  useChatScrollHandler({
+    chatRef,
+    bottomRef,
+    count: data?.pages?.[0].data?.length ?? 0,
   });
 
   if (status === "pending") {
@@ -92,8 +104,27 @@ const ChatMessages: FC<ChatMessagesProps> = ({
     );
 
   return (
-    <div className="flex-1 flex flex-col py-4 overflow-y-auto">
+    <div ref={chatRef} className="flex-1 flex flex-col py-4 overflow-y-auto">
+      {!hasNextPage && (
+        <IntroBanner
+          type={type}
+          name={name}
+          creationDate={workspaceData.created_at}
+        />
+      )}
+      {hasNextPage && (
+        <div className="flex justify-center">
+          {isFetchingNextPage ? (
+            <DotAnimatedLoader />
+          ) : (
+            <Button variant="link" onClick={() => fetchNextPage()}>
+              Load Previous Messages
+            </Button>
+          )}
+        </div>
+      )}
       <div className="flex flex-col-reverse mt-auto">{renderMessages()}</div>
+      <div ref={bottomRef} />
     </div>
   );
 };
