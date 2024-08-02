@@ -1,9 +1,8 @@
 import { NextApiRequest } from "next";
 
-import { SupabaseClient } from "@supabase/supabase-js";
-
 import { getUserDataPages } from "@/actions/get-user-data";
 import supabaseServerClientPages from "@/supabase/supabaseServerPages";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 import { SocketIoApiResponse } from "@/types/app";
 
@@ -14,7 +13,6 @@ export default async function handler(
   if (!["DELETE", "PATCH"].includes(req.method!)) {
     return res.status(405).json({ error: "Method not allowed" });
   }
-
   try {
     const userData = await getUserDataPages(req, res);
 
@@ -22,37 +20,46 @@ export default async function handler(
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const { messageId, channelId, workspaceId } = req.query as Record<
-      string,
-      string
-    >;
+    const { messageId } = req.query;
+    const { content } = req.body;
 
-    if (!messageId || !channelId || !workspaceId) {
+    if (!messageId) {
       return res.status(400).json({ error: "Invalid request" });
     }
-
-    const { content } = req.body;
 
     const supabase = supabaseServerClientPages(req, res);
 
     const { data: messageData, error } = await supabase
-      .from("messages")
-      .select("*, user: user_id (*)")
+      .from("direct_messages")
+      .select(
+        `
+        *,
+        user_one:users!direct_messages_user_one_fkey(*),
+        user_two:users!direct_messages_user_two_fkey(*)
+        `
+      )
       .eq("id", messageId)
       .single();
 
+    console.log("DIRECT MESSAGE messageData: ", error);
+    console.log("DIRECT MESSAGE messageData: ", messageData);
+
     if (error || !messageData) {
+      console.log("DIRECT MESSAGE ERROR: ", error);
       return res.status(404).json({ error: "Message not found" });
     }
 
-    // type in ('user', 'admin', 'regulator')
-    const isMessageOwner = messageData.user_id === userData.id;
+    const isMessageOwner =
+      userData.id === messageData.user_one.id ||
+      userData.id === messageData.user_two.id;
     const isAdmin = userData.type === "admin";
     const isRegulator = userData.type === "regulator";
 
-    const canEditMessage = isMessageOwner || !messageData.is_deleted;
+    const canEditMessage =
+      isMessageOwner || isAdmin || isRegulator || !messageData.is_deleted;
 
     if (!canEditMessage) {
+      console.log("DIRECT MESSAGE ERROR: canEditMessage:", error);
       return res.status(403).json({ error: "Forbidden" });
     }
 
@@ -61,30 +68,34 @@ export default async function handler(
         return res.status(403).json({ error: "Forbidden" });
       }
 
-      await updateMessageContent(supabase, messageId, content);
+      await updateMessageContent(supabase, messageId as string, content);
     } else if (req.method === "DELETE") {
-      await deleteMessage(supabase, messageId);
+      await deleteMessage(supabase, messageId as string);
     }
 
     const { data: updatedMessage, error: messageError } = await supabase
-      .from("messages")
-      .select("*, user: user_id (*)")
-      .order("created_at", { ascending: true })
+      .from("direct_messages")
+      .select(
+        `
+        *,
+        user_one:users!direct_messages_user_one_fkey(*),
+        user_two:users!direct_messages_user_two_fkey(*),
+        user:users!direct_messages_user_fkey(*)
+        `
+      )
       .eq("id", messageId)
       .single();
 
     if (messageError || !updatedMessage) {
+      console.log("DIRECT MESSAGE ERROR: ", messageError);
       return res.status(404).json({ error: "Message not found" });
     }
 
-    res?.socket?.server?.io?.emit(
-      `channel:${channelId}:channel-messages:update`,
-      updatedMessage
-    );
+    res?.socket?.server?.io?.emit("direct-message:update", updatedMessage);
     return res.status(200).json({ message: updatedMessage });
   } catch (error) {
-    console.log("MESSAGE ID ERROR", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    console.log("DIRECT MESSAGE ERROR: ", error);
+    return res.status(500).json({ error: "Error sending message" });
   }
 }
 
@@ -94,25 +105,35 @@ async function updateMessageContent(
   content: string
 ) {
   await supabase
-    .from("messages")
+    .from("direct_messages")
     .update({
       content,
       updated_at: new Date().toISOString(),
     })
     .eq("id", messageId)
-    .select("*, user: user_id (*)")
+    .select(
+      `*, 
+      user_one:users!direct_messages_user_one_fkey(*), 
+      user_two:users!direct_messages_user_two_fkey(*)
+    `
+    )
     .single();
 }
 
 async function deleteMessage(supabase: SupabaseClient, messageId: string) {
   await supabase
-    .from("messages")
+    .from("direct_messages")
     .update({
       content: "This message has been deleted",
       file_url: null,
       is_deleted: true,
     })
     .eq("id", messageId)
-    .select("*, user: user_id (*)")
+    .select(
+      `*, 
+        user_one:users!direct_messages_user_one_fkey(*), 
+        user_two:users!direct_messages_user_two_fkey(*)
+      `
+    )
     .single();
 }

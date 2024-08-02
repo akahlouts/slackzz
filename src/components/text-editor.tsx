@@ -73,7 +73,7 @@ const TextEditor: FC<TextEditorProps> = ({
       if (type === "Channel" && channel) {
         endpoint += `?channelId=${channel.id}&workspaceId=${workspaceData.id}`;
       } else if (type === "DirectMessage" && recipientId) {
-        endpoint += `?reipientId=${recipientId}&workspaceId=${workspaceData.id}`;
+        endpoint += `?recipientId=${recipientId}&workspaceId=${workspaceData.id}`;
       }
 
       await axios.post(endpoint, payload);

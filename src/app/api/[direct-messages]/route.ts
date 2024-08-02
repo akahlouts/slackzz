@@ -37,7 +37,7 @@ export async function GET(req: Request) {
         `and(user_one.eq.${userId}), user_two.eq.${recipientId}, and(user_one.eq.${recipientId}), user_two.eq.${userId}`
       )
       .range(from, to)
-      .order("created_at", { ascending: true });
+      .order("created_at", { ascending: false });
 
     if (error) {
       console.error("Error fetching direct messages", error);
